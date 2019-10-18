@@ -1,0 +1,19 @@
+{
+  "name": "app/emergencias",
+  "description": "example of routes with phroute and pagejs",
+  "authors": [
+      {
+          "name": "Jose Chirinos",
+          "email": "josealexcba@gmail.com"
+      }
+  ],
+  "require": {
+      "phroute/phroute": "^2.1",
+      "twig/twig": "~1.0",
+      "slim/slim": "2.*",
+      "palanik/corsslim": "*",
+      "fpdo/fluentpdo": "1.1.*",
+      "firebase/php-jwt": "^5.0",
+      "fightbulc/moment": "1.*"
+  }
+}

@@ -36,7 +36,7 @@
 	
 	/* Hello World */
 	$app->get('/', function(){
-		echo 'Funciona Correctamente';
+		echo 'Funciona Carajo';
 	});
 
 	$app->get('/peticion/:id', function($id){

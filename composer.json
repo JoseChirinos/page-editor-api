@@ -1,6 +1,6 @@
 {
-  "name": "app/emergencias",
-  "description": "example of routes with phroute and pagejs",
+  "name": "app/pageeditorapi",
+  "description": "page editor api",
   "authors": [
       {
           "name": "Jose Chirinos",
@@ -8,12 +8,14 @@
       }
   ],
   "require": {
-      "phroute/phroute": "^2.1",
-      "twig/twig": "~1.0",
-      "slim/slim": "2.*",
-      "palanik/corsslim": "*",
-      "fpdo/fluentpdo": "1.1.*",
-      "firebase/php-jwt": "^5.0",
-      "fightbulc/moment": "1.*"
+    "phroute/phroute": "^2.1",
+    "twig/twig": "~1.0",
+    "slim/slim": "2.*",
+    "palanik/corsslim": "*",
+    "fpdo/fluentpdo": "1.1.*",
+    "firebase/php-jwt": "^5.0",
+    "fightbulc/moment": "1.*",
+    "hashids/hashids": "^4.0",
+    "miladrahimi/phpcrypt": "^3.0"
   }
 }

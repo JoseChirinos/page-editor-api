@@ -123,18 +123,4 @@
         }
     });
 
-    $app->get('/user/time', function() use($app){
-        //var_dump(getdate());
-        /* only test */
-        // use Hashids\Hashids;
-        // $hashids = new Hashids('', 10);
-        // echo $hashids->encode(1);
-
-        // $crypt = new Crypt();
-        // $r = $crypt->encrypt("This is an important content!");
-        // echo $r.'<br />';
-        // echo $crypt->decrypt($r);
-
-    });
-
 ?>

@@ -18,30 +18,30 @@
         }
         
         public function getAll(){
-        /* 1. consulta with FluentPDO */
-        $query = $this->fpdo->from($this->table)->where('status=1')->orderBy('idUser DESC')->execute();
-        $result = null;
-        /* 2. encriptar IDs */
-        if($query->rowCount()!=0){
-            $result = $query->fetchAll(PDO::FETCH_OBJ);
-            foreach ($result as $key => $value) {
-                $value->idUser = $this->hashids->encode($value->idUser);
+            /* 1. consulta with FluentPDO */
+            $query = $this->fpdo->from($this->table)->where('status=1')->orderBy('idUser DESC')->execute();
+            $result = null;
+            /* 2. encriptar IDs */
+            if($query->rowCount()!=0){
+                $result = $query->fetchAll(PDO::FETCH_OBJ);
+                foreach ($result as $key => $value) {
+                    $value->idUser = $this->hashids->encode($value->idUser);
+                }
+                $status = true;
+                $message = "Lista de cuentas habilitadas";
             }
-            $status = true;
-            $msg = "Lista de cuentas habilitadas";
-        }
-        else{
-            $result = array();
-            $status = false;
-            $msg = "No existen registros";
-        }
-        /* 3. retornar valores en un array Response */
-        return $this->response->send(
-            $result,
-            $status,
-            $msg,
-            []
-        );
+            else{
+                $result = array();
+                $status = false;
+                $message = "No existen registros";
+            }
+            /* 3. retornar valores en un array Response */
+            return $this->response->send(
+                $result,
+                $status,
+                $message,
+                []
+            );
         }
 
         public function getAllDisabled(){
@@ -55,43 +55,47 @@
                     $value->idUser = $this->hashids->encode($value->idUser);
                 }
                 $status = true;
-                $msg = "Lista de cuentas deshabilitadas";
+                $message = "Lista de cuentas deshabilitadas";
             }
             else{
                 $result = array();
                 $status = false;
-                $msg = "No existen registros";
+                $message = "No existen registros";
             }
             /* 3. retornar valores en un array Response */
             return $this->response->send(
                 $result,
                 $status,
-                $msg,
+                $message,
                 []
             );
         }
 
         public function getId($id){
             /* 1. consulta with FluentPDO */
-            $query = $this->fpdo->from($this->table)->where('idUser',$this->hashids->decode($id))->execute();
+            $idUser = $this->hashids->decode($id)[0];            
+            $where = array(
+                "idUser"=>$idUser,
+            );
+            $query = $this->fpdo->from($this->table)->where($where)->execute();
             $result = null;
             /* 2. encriptar IDs */
             if($query->rowCount()!=0){
                 $result = $query->fetchObject();
                 $result->idUser =  $this->hashids->encode($result->idUser);
                 $status = true;
-                $msg = "Encontrado con éxito";
+                $message = "Encontrado con éxito";
             }
             else{
                 $result = null;
                 $status = false;
-                $msg = "No se encontro ningun resultado";
+                $message = "No se encontro ningun resultado";
             }
             /* 3. retornar valores en un array */
             return $this->response->send(
                 $result,
                 $status,
-                $msg,
+                $message,
                 []
             );
         }
@@ -135,7 +139,7 @@
 
         public function update($data){
             /* 1. Verificamos si existe usuario */
-            $idUser = $this->hashids->decode($data->idUser);
+            $idUser = $this->hashids->decode($data->idUser)[0];
             $where = array(
                 "idUser"=>$idUser,
             );
@@ -169,7 +173,7 @@
         
         public function disabled($data){
             /* 1. Verificamos usuario */
-            $idUser = $this->hashids->decode($data->idUser);            
+            $idUser = $this->hashids->decode($data->idUser)[0];            
             $where = array(
                 "idUser"=>$idUser,
             );
@@ -191,10 +195,10 @@
                             )->execute();
                     if($query){
                         $status = true;
-                        $msg = "Cuenta Deshabilitada";
+                        $message = "Cuenta Deshabilitada";
                     }else{
                         $status = false;
-                        $msg = "La cuenta no existe o ya esta deshabilitada";
+                        $message = "La cuenta no existe o ya esta deshabilitada";
                     }
             }else{
                 $result = -1;
@@ -206,14 +210,14 @@
             return $this->response->send(
                 $result,
                 $status,
-                $msg,
+                $message,
                 []
             );
         }
 
         public function enabled($data){
             /* 1. Verificamos usuario */
-            $idUser = $this->hashids->decode($data->idUser);            
+            $idUser = $this->hashids->decode($data->idUser)[0];            
             $where = array(
                 "idUser"=>$idUser,
             );
@@ -234,24 +238,24 @@
                     'idUser',
                     $idUser
                     )->execute();
-                $msg = "Cuenta Habilitada";
+                $message = "Cuenta Habilitada";
                 $status = true;
             }else{
-                $msg = "Usuario no registrado";
+                $message = "Usuario no registrado";
                 $status = false;
             }
             /* 2. retornar valores en un array */
             return $this->response->send(
                 $result,
                 $status,
-                $msg,
+                $message,
                 []
             );
         }
 
         public function changePassword($data){
             /* 1. Verificamos usuario */
-            $idUser = $this->hashids->decode($data->idUser);
+            $idUser = $this->hashids->decode($data->idUser)[0];
             $where = array(
                 "idUser"=>$idUser
             );
@@ -275,27 +279,27 @@
                         'idUser',
                         $idUser
                     )->execute();
-                    $msg = "Contraseña Cambiada";
+                    $message = "Contraseña Cambiada";
                     $status = true;
                 }else{
-                    $msg = "La Contraseña Actual que escribio es Incorrecta";
+                    $message = "La Contraseña Actual que escribio es Incorrecta";
                     $status = false;
                 }
             }else{
-                $msg = "Usuario no registrado";
+                $message = "Usuario no registrado";
                 $status = false;
             }
             /* 2. retornar valores en un array */
             return $this->response->send(
                 $result,
                 $status,
-                $msg,
+                $message,
                 []
             );
         }
 
         public function checkUser($data){
-            $idUser = $this->hashids->decode($data->idUser);
+            $idUser = $this->hashids->decode($data->idUser)[0];
             $where = array(
                 "idUser"=>$idUser
             );
@@ -307,12 +311,12 @@
                 "password" => $this->crypt->decrypt($userActual->password)
             );
             $status = true;
-            $msg = "Datos encontrados";
+            $message = "Datos encontrados";
                 
             return $this->response->send(
                 $result,
                 $status,
-                $msg,
+                $message,
                 []
             );
         }

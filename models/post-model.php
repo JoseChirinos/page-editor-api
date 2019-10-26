@@ -20,7 +20,7 @@
             $conex = $this->pdo;
             $sql = 'SELECT
                     u.idUser, p.idPost, u.first_name,
-                    u.last_name, p.title, p.content, 
+                    u.last_name, p.title, p.content, p.summary,
                     p.data_start, p.data_updated, g.urlImage
                     FROM user_post AS up
                     INNER JOIN user AS u
@@ -65,7 +65,7 @@
             $conex = $this->pdo;
             $sql = 'SELECT
                     u.idUser, p.idPost, u.first_name,
-                    u.last_name, p.title, p.content, 
+                    u.last_name, p.title, p.content, p.summary,
                     p.data_start, p.data_updated, g.urlImage
                     FROM user_post AS up
                     INNER JOIN user AS u
@@ -116,7 +116,7 @@
             $conex = $this->pdo;
             $sql = 'SELECT
                     u.idUser, p.idPost, u.first_name,
-                    u.last_name, p.title, p.content, 
+                    u.last_name, p.title, p.content, p.summary,
                     p.data_start, p.data_updated,
                     g.idGalery, g.urlImage
                     FROM user_post AS up
@@ -174,6 +174,7 @@
                 $values = array(
                     'title' => $data->title,
                     'content' => $data->content,
+                    'summary' => $data->summary,
                     'galeryId' => $idImage,
                     'data_start' => new FluentLiteral("CURRENT_TIMESTAMP"),
                     'data_updated' => new FluentLiteral("CURRENT_TIMESTAMP")
@@ -220,6 +221,7 @@
                 $values = array(
                     'title' => $data->title,
                     'content' => $data->content,
+                    'summary' => $data->summary,
                     'data_updated' => new FluentLiteral("CURRENT_TIMESTAMP"),
                 );
                 $query = $this->fpdo->update($this->table)->set($values)->where('idPost',$idPost);
@@ -247,7 +249,7 @@
             $conex = $this->pdo;
             $sql = 'SELECT
                     u.idUser, p.idPost, u.first_name,
-                    u.last_name, p.title, p.content, 
+                    u.last_name, p.title, p.content, p.summary
                     p.data_start, p.data_updated,
                     g.idGalery, g.urlImage
                     FROM user_post AS up

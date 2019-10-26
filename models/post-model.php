@@ -60,6 +60,56 @@
 
         }
 
+        public function getAllUser($id){
+            $idUser = $this->hashids->decode($id)[0];
+            $conex = $this->pdo;
+            $sql = 'SELECT
+                    u.idUser, p.idPost, u.first_name,
+                    u.last_name, p.title, p.content, 
+                    p.data_start, p.data_updated, g.urlImage
+                    FROM user_post AS up
+                    INNER JOIN user AS u
+                    ON up.userId = u.idUser
+                    INNER JOIN post AS p
+                    ON up.postId = p.idPost
+                    INNER JOIN galery AS g
+                    ON p.galeryId = g.idGalery
+                    WHERE up.userId = ?
+                    ORDER BY p.idPost DESC';
+            $query = $conex->prepare($sql);
+            $query->execute(
+                array(
+                    intval($idUser)
+                )
+            );
+            $result = null;
+            if($query->rowCount()!=0){
+                $result = array();
+                $serverResponse = $query->fetchAll(PDO::FETCH_OBJ);
+                foreach ($serverResponse as $r) {
+                    $r->idUser = $this->hashids->encode($r->idUser);
+                    $r->idPost = $this->hashids->encode($r->idPost);
+                    array_push($result,$r);
+                }
+                $status = true;
+                $message = "Encontrado con éxito";
+            }
+            else{
+                $result = array();
+                $status = false;
+                $message = "No se encontro ningun resultado";
+            }
+
+            /* 3. retornar valores en un array Response */
+            return $this->response->send(
+                $result,
+                $status,
+                $message,
+                []
+            );
+
+        }
+
         public function getId($id){
             /* 1. consulta with FluentPDO */
             $idPost = $this->hashids->decode($id)[0];

@@ -160,16 +160,11 @@
         public function add($data){
             /* 0. Verificamos si esta habilitado */
             $idUser = $this->hashids->decode($data->idUser)[0];
-            $where = array(
-                "idUser"=>$idUser,
-                "status"=> new FluentLiteral("1"),
-            );
-            $queryUser = $this->fpdo->from('user')->where($where)->orderBy('idUser DESC')->limit(1)->execute();   
 
-            if($queryUser->rowCount() != 0){
+            if($this->checkPermission($idUser)){
                 /* 1. Guardamos Imagen */
                 $image = new GaleryModel();
-                $idImage = $image->saveImage($data->coverImage);
+                $idImage = $image->saveImage($data->cover_image);
                 /* 2. Guardamos Post */
                 $values = array(
                     'title' => $data->title,
@@ -210,13 +205,8 @@
             /* 0. Verificamos si esta habilitado */
             $idUser = $this->hashids->decode($data->idUser)[0];
             $idPost = $this->hashids->decode($data->idPost)[0];
-            $where = array(
-                "idUser"=>$idUser,
-                "status"=> new FluentLiteral("1"),
-            );
-            $queryUser = $this->fpdo->from('user')->where($where)->orderBy('idUser DESC')->limit(1)->execute();   
 
-            if($queryUser->rowCount() != 0){
+            if($this->checkPermission($idUser)){
                 /* Guardamos nuevos datos */
                 $values = array(
                     'title' => $data->title,
@@ -244,59 +234,66 @@
         }
 
         public function delete($data){
-            /* 1. consulta with FluentPDO */
+            /* 1. Verificamos si el usuario esta habilitado */            
             $idPost = $this->hashids->decode($data->idPost)[0];
-            $conex = $this->pdo;
-            $sql = 'SELECT
-                    u.idUser, p.idPost, u.first_name,
-                    u.last_name, p.title, p.content, p.summary
-                    p.data_start, p.data_updated,
-                    g.idGalery, g.urlImage
-                    FROM user_post AS up
-                    INNER JOIN user AS u
-                    ON up.userId = u.idUser
-                    INNER JOIN post AS p
-                    ON up.postId = p.idPost
-                    INNER JOIN galery AS g
-                    ON p.galeryId = g.idGalery
-                    WHERE up.postId = ?
-                    ORDER BY p.idPost DESC';
-            $query = $conex->prepare($sql);
-            $query->execute(
-                array(
-                    intval($idPost)
-                )
-            );
+            $idUser = $this->hashids->decode($data->idUser)[0];
             $result = null;
             /* 2. encriptar IDs */
-            if($query->rowCount()!=0){
-                $result = $query->fetchObject();
-                $image = new GaleryModel();
-                /*** A. Eliminar post_user ***/
-                $where = array(
-                    'userId' => intval($result->idUser),
-                    'postId' => intval($result->idPost),
+            if($this->checkPermission($idUser)){
+                /* A. consulta with FluentPDO */
+                $conex = $this->pdo;
+                $sql = 'SELECT
+                        u.idUser, p.idPost, u.first_name,
+                        u.last_name, p.title, p.content, p.summary,
+                        g.idGalery, g.urlImage
+                        FROM user_post AS up
+                        INNER JOIN user AS u
+                        ON up.userId = u.idUser
+                        INNER JOIN post AS p
+                        ON up.postId = p.idPost
+                        INNER JOIN galery AS g
+                        ON p.galeryId = g.idGalery
+                        WHERE up.postId = ?
+                        ORDER BY p.idPost DESC';
+                $query = $conex->prepare($sql);
+                $query->execute(
+                    array(
+                        intval($idPost)
+                    )
                 );
-                $query = $this->fpdo->deleteFrom('user_post')->where($where);
-                $query->execute();
-                
-                /*** B. Eliminar Post ***/
-                $where = array(
-                    'idPost' => intval($result->idPost),
-                );
-                $query = $this->fpdo->deleteFrom('post')->where($where);
-                $query->execute();
+                if($query->rowCount() != 0){
+                    /*** A. Eliminar post_user ***/
+                    $result = $query->fetchObject();
+                    $image = new GaleryModel();
+                    $where = array(
+                        'userId' => intval($result->idUser),
+                        'postId' => intval($result->idPost),
+                    );
+                    $query = $this->fpdo->deleteFrom('user_post')->where($where);
+                    $query->execute();
+                    
+                    /*** B. Eliminar Post ***/
+                    $where = array(
+                        'idPost' => intval($result->idPost),
+                    );
+                    $query = $this->fpdo->deleteFrom('post')->where($where);
+                    $query->execute();
 
-                /*** C. Eliminar Imagen ***/
-                $image->deleteImage($result->idGalery,$result->urlImage);
+                    /*** C. Eliminar Imagen ***/
+                    $image->deleteImage($result->idGalery,$result->urlImage);
 
-                $status = true;
-                $message = "Eliminado con éxito";
+                    $status = true;
+                    $message = "Eliminado con éxito";
+                }else{
+                    $result = null;
+                    $status = false;
+                    $message = "El post no existe";
+                }
             }
             else{
-                $result = null;
+                $result = -1;
+                $message = "Usted esta deshabilitado, no puede eliminar";
                 $status = false;
-                $message = "El post no existe";
             }
 
             /* 3. retornar valores en un array */
@@ -306,6 +303,19 @@
                 $message,
                 []
             );
+        }
+
+        public function checkPermission($idUser){
+            $where = array(
+                "idUser"=>$idUser,
+                "status"=> new FluentLiteral("1"),
+            );
+            $queryUser = $this->fpdo->from('user')->where($where)->orderBy('idUser DESC')->limit(1)->execute();
+            if($queryUser->rowCount()!=0){
+                return true;
+            }else{
+                return false;
+            }
         }
 
     }

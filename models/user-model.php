@@ -304,6 +304,7 @@
                 "idUser"=>$idUser
             );
             $queryUser = $this->fpdo->from($this->table)->where($where)->orderBy('idUser DESC')->limit(1)->execute();
+            
             $userActual = $queryUser->fetchObject();
             $result = array(
                 "name" => $userActual->first_name.' '.$userActual->last_name,
@@ -313,6 +314,56 @@
             $status = true;
             $message = "Datos encontrados";
                 
+            return $this->response->send(
+                $result,
+                $status,
+                $message,
+                []
+            );
+        }
+        public function signIn($data){
+            // $idUser = $this->hashids->decode($data->idUser)[0];
+
+            // $where = array(
+            //     "idUser"=>$idUser
+            // );
+            // $queryUser = $this->fpdo->from($this->table)->where($where)->orderBy('idUser DESC')->limit(1)->execute();
+            // $userActual = $queryUser->fetchObject();
+            // $result = array(
+            //     "name" => $userActual->first_name.' '.$userActual->last_name,
+            //     "email" => $userActual->email,
+            //     "password" => $this->crypt->decrypt($userActual->password)
+            // );
+            // $status = true;
+            // $message = "Datos encontrados";
+            $where = array(
+                "email"=>$data->email,
+            );
+            $queryUser = $this->fpdo->from('user')->where($where)->orderBy('idUser DESC')->limit(1)->execute();
+            if($queryUser->rowCount()!=0){
+                $userActual = $queryUser->fetchObject();
+                $password = $this->crypt->decrypt($userActual->password);
+                if($password == $data->password ){
+                    $result = array(
+                        'idUser' => $this->hashids->encode($userActual->idUser),
+                        'first_name' => $userActual->first_name,
+                        'last_name' => $userActual->last_name,
+                        'email' => $userActual->email,
+                        'type_user' => $userActual->type_user,
+                    );
+                    $status = true;
+                    $message = "Acceso permitido";
+                }else{
+                    $result = null;
+                    $status = false;
+                    $message = "Contraseña incorrecta";
+                }
+            }else{
+                $result = null;
+                $status = false;
+                $message = "Su correo no esta registrado";
+            }
+
             return $this->response->send(
                 $result,
                 $status,

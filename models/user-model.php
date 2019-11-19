@@ -322,20 +322,6 @@
             );
         }
         public function signIn($data){
-            // $idUser = $this->hashids->decode($data->idUser)[0];
-
-            // $where = array(
-            //     "idUser"=>$idUser
-            // );
-            // $queryUser = $this->fpdo->from($this->table)->where($where)->orderBy('idUser DESC')->limit(1)->execute();
-            // $userActual = $queryUser->fetchObject();
-            // $result = array(
-            //     "name" => $userActual->first_name.' '.$userActual->last_name,
-            //     "email" => $userActual->email,
-            //     "password" => $this->crypt->decrypt($userActual->password)
-            // );
-            // $status = true;
-            // $message = "Datos encontrados";
             $where = array(
                 "email"=>$data->email,
             );

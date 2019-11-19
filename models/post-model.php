@@ -170,7 +170,7 @@
                     'title' => $data->title,
                     'content' => $data->content,
                     'summary' => $data->summary,
-                    'galeryId' => $idImage,
+                    'galeryId' => intval($idImage['idGalery']),
                     'data_start' => new FluentLiteral("CURRENT_TIMESTAMP"),
                     'data_updated' => new FluentLiteral("CURRENT_TIMESTAMP")
                 );

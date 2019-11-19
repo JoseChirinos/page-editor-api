@@ -15,20 +15,23 @@
             $this->crypt    = new Crypt('P463');
         }
 
-        public function saveImage($dataImage){
+        public function saveImage($dataImage, $withThumb = true, $format = 'jpeg'){
 
             $url_picture = 'upload';
             define('UPLOAD_DIRECTION', $url_picture.'/');
 
-            $image = base64_decode(str_replace('data:image/jpeg;base64,', '', $dataImage));
-			$nameImage = uniqid().'.jpg';
+            $image = base64_decode(str_replace('data:image/'.$format.';base64,', '', $dataImage));
+			$nameImage = uniqid().'.'.$format;
 			// Save image original size
 			$formImage = imagecreatefromstring($image);
 			imagejpeg( $formImage, UPLOAD_DIRECTION.$nameImage, 100 );
-			imagedestroy( $formImage );
-			// Save thumbnail
-			$thumb = new ImageResizer();
-            $thumb->smart_resize_image(null,$image,150,75,false,UPLOAD_DIRECTION.'thumb_'.$nameImage);
+            imagedestroy( $formImage );
+
+            if($withThumb){
+                // Save thumbnail
+                $thumb = new ImageResizer();
+                $thumb->smart_resize_image(null,$image,150,75,false,UPLOAD_DIRECTION.'thumb_'.$nameImage);
+            }
             
             /* Guardamos Imagen */
 
@@ -40,7 +43,10 @@
             $query = $this->fpdo->insertInto($this->table)->values($values);
             $idInsert = $query->execute();
             
-            return $idInsert;
+            return array(
+                "idGalery"=>$idInsert,
+                "urlImage"=>$nameImage,
+            );
         }
 
         public function deleteImage($idGalery,$fileName){
@@ -66,5 +72,41 @@
             $query->execute();
 
         }
+
+        public function saveDirect($data){
+            $imageThumb = ($data->thumb === 'true' );
+            $imageResult = $this->saveImage($data->cover_image, $imageThumb);
+            return $this->response->send(
+                $imageResult,
+                true,
+                "Imagen Guardada",
+                []
+            );
+        }
+        public function deleteDirect($data){
+            $where = array(
+                "idGalery"=>intval($data->idGalery),
+            );
+            $query = $this->fpdo->from($this->table)->where($where)->execute();
+            if($query->rowCount()!=0){
+                $result = $query->fetchObject();
+                $imageResult = $this->deleteImage($where['idGalery'], $result->urlImage);
+                $status = true;
+                $message = "Eliminado";
+            }
+            else{
+                $result = null;
+                $status = false;
+                $message = "La imagen no existe";
+            }
+
+            return $this->response->send(
+                $result,
+                $status,
+                $message,
+                []
+            );
+        }
+
     }
 ?>

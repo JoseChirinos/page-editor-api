@@ -23,8 +23,14 @@
             $image = base64_decode(str_replace('data:image/'.$format.';base64,', '', $dataImage));
 			$nameImage = uniqid().'.'.$format;
 			// Save image original size
-			$formImage = imagecreatefromstring($image);
-			imagejpeg( $formImage, UPLOAD_DIRECTION.$nameImage, 100 );
+            $formImage = imagecreatefromstring($image);
+            if($format === 'jpeg'){
+                imagejpeg( $formImage, UPLOAD_DIRECTION.$nameImage, 100 );
+            }else{
+                imagealphablending($formImage, true);
+                imagesavealpha($formImage, true);
+                imagepng($formImage, UPLOAD_DIRECTION.$nameImage);
+            }
             imagedestroy( $formImage );
 
             if($withThumb){
@@ -75,7 +81,8 @@
 
         public function saveDirect($data){
             $imageThumb = ($data->thumb === 'true' );
-            $imageResult = $this->saveImage($data->cover_image, $imageThumb);
+            $imageFormat = $data->format;
+            $imageResult = $this->saveImage($data->cover_image, $imageThumb, $imageFormat);
             return $this->response->send(
                 $imageResult,
                 true,

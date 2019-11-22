@@ -1,7 +1,7 @@
-## Servicios Rest del sistema de emergencia
+## Servicios Rest SitioWeb Blog Dinamico
 
 #### Autores
-[@JoseChirinos](http://josechirinos.com) y  [@fjgeek](https://github.com/Fjgeek)
+[@JoseChirinos](http://josechirinos.com)
 
 ### Detalles técnicos
 

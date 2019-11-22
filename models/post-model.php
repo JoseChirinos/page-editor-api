@@ -16,6 +16,49 @@
             $this->hashids  = new Hashids('', 10);
         }
         
+        public function getFirst(){
+            $conex = $this->pdo;
+            $sql = 'SELECT
+                    p.idPost, u.first_name,
+                    u.last_name, p.title, p.summary,
+                    p.data_start, g.urlImage
+                    FROM user_post AS up
+                    INNER JOIN user AS u
+                    ON up.userId = u.idUser
+                    INNER JOIN post AS p
+                    ON up.postId = p.idPost
+                    INNER JOIN galery AS g
+                    ON p.galeryId = g.idGalery
+                    ORDER BY p.idPost DESC LIMIT 3';
+            $query = $conex->prepare($sql);
+            $query->execute();
+            $result = null;
+            if($query->rowCount()!=0){
+                $result = array();
+                $serverResponse = $query->fetchAll(PDO::FETCH_OBJ);
+                foreach ($serverResponse as $r) {
+                    $r->idPost = $this->hashids->encode($r->idPost);
+                    array_push($result,$r);
+                }
+                $status = true;
+                $message = "Encontrado con éxito";
+            }
+            else{
+                $result = array();
+                $status = false;
+                $message = "No se encontro ningun resultado";
+            }
+
+            /* 3. retornar valores en un array Response */
+            return $this->response->send(
+                $result,
+                $status,
+                $message,
+                []
+            );
+
+        }
+
         public function getAll(){
             $conex = $this->pdo;
             $sql = 'SELECT

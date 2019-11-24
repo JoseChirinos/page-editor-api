@@ -15,7 +15,6 @@
     "fpdo/fluentpdo": "1.1.*",
     "firebase/php-jwt": "^5.0",
     "fightbulc/moment": "1.*",
-    "hashids/hashids": "^4.0",
-    "miladrahimi/phpcrypt": "^3.0"
+    "hashids/hashids": "^4.0"
   }
 }

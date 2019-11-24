@@ -1,5 +1,5 @@
 <?php
-    use MiladRahimi\PhpCrypt\Crypt;
+
     use Hashids\Hashids;
 
     class PostModel{
@@ -12,7 +12,6 @@
             $this->pdo 		= $this->conexion->getConexion();
             $this->fpdo		= $this->conexion->getFluent();
             $this->response = new Response();
-            $this->crypt    = new Crypt('P463');
             $this->hashids  = new Hashids('', 10);
         }
         

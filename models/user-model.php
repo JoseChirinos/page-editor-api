@@ -1,6 +1,5 @@
 <?php
 
-    use MiladRahimi\PhpCrypt\Crypt;
     use Hashids\Hashids;
 
     class UserModel{
@@ -13,7 +12,6 @@
             $this->pdo 		= $this->conexion->getConexion();
             $this->fpdo		= $this->conexion->getFluent();
             $this->response = new Response();
-            $this->crypt    = new Crypt('P463');
             $this->hashids  = new Hashids('', 10);
         }
         
@@ -112,7 +110,7 @@
                         'first_name' => $data->first_name,
                         'last_name' => $data->last_name,
                         'email' => $data->email,
-                        'password' => $this->crypt->encrypt($data->password),
+                        'password' => $data->password,
                         'type_user' => $data->type_user, /* R: Root, A: Admin, P: Publico */
                         'data_start' => new FluentLiteral("CURRENT_TIMESTAMP"),
                         'data_updated' => new FluentLiteral("CURRENT_TIMESTAMP"),
@@ -264,12 +262,12 @@
             if($queryUser->rowCount() != 0 ){
                 /* 2.1. Cambiar Contraseña */
                 $userActual = $queryUser->fetchObject();
-                $passwordUserActual = $this->crypt->decrypt($userActual->password);
+                $passwordUserActual = $userActual->password;
                 
                 if($data->password == $passwordUserActual){
                     $values = array(
                         "data_updated"=> new FluentLiteral("CURRENT_TIMESTAMP"),
-                        "password"=> $this->crypt->encrypt($data->new_password),
+                        "password"=> $data->new_password,
                     );
                     $query = $this->fpdo->update(
                     $this->table
@@ -309,7 +307,7 @@
             $result = array(
                 "name" => $userActual->first_name.' '.$userActual->last_name,
                 "email" => $userActual->email,
-                "password" => $this->crypt->decrypt($userActual->password)
+                "password" => $userActual->password
             );
             $status = true;
             $message = "Datos encontrados";
@@ -328,7 +326,7 @@
             $queryUser = $this->fpdo->from('user')->where($where)->orderBy('idUser DESC')->limit(1)->execute();
             if($queryUser->rowCount()!=0){
                 $userActual = $queryUser->fetchObject();
-                $password = $this->crypt->decrypt($userActual->password);
+                $password = $userActual->password;
                 if($password == $data->password ){
                     $result = array(
                         'idUser' => $this->hashids->encode($userActual->idUser),

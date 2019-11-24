@@ -1,6 +1,4 @@
 <?php
-    
-    use MiladRahimi\PhpCrypt\Crypt;
 
     class GaleryModel {
         private $conexion;
@@ -11,8 +9,7 @@
             $this->conexion = new Conexion();
             $this->pdo 		= $this->conexion->getConexion();
             $this->fpdo		= $this->conexion->getFluent();
-            $this->response = new Response();
-            $this->crypt    = new Crypt('P463');
+            $this->response = new Response();            
         }
 
         public function saveImage($dataImage, $withThumb = true, $format = 'jpeg'){

@@ -13,7 +13,7 @@
     "slim/slim": "2.*",
     "palanik/corsslim": "*",
     "fpdo/fluentpdo": "1.1.*",
-    "firebase/php-jwt": "^5.0",
+    "firebase/php-jwt": "^6.0",
     "fightbulc/moment": "1.*",
     "hashids/hashids": "^4.0",
     "miladrahimi/phpcrypt": "^3.0"
